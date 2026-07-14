@@ -1,0 +1,803 @@
+/* ================================================================
+   SCOTTKIRVAN.COM — MONOCHROME CRT TELEVISION EFFECT
+   Old B&W television power-on sequence + phosphor display aesthetic
+   ================================================================ */
+
+/* ================================================================
+   TWEAK HERE — all tuneable values in one place
+
+   Light mode  = TV in a bright room (light grey bg, dark text)
+   Dark mode   = TV in a dark room   (dark bg, phosphor-white text)
+   ================================================================ */
+
+/* --- Light mode (default) ------------------------------------ */
+:root {
+  --crt-bg: #d0d0d0;
+  /* light grey screen */
+  --crt-bg-soft: #c0c0c0;
+  --crt-bg-mute: #b0b0b0;
+  --crt-bg-code: #dedede;
+  --crt-tv-off: #888888;
+  /* TV-off grey — same in both modes */
+  --crt-nav-bg: 200, 200, 200;
+  /* nav background RGB channels */
+
+  --crt-text: #0e0e0e;
+  /* dark text on light screen */
+  --crt-text-dim: #444444;
+  --crt-text-faint: #787878;
+  --crt-border: #909090;
+
+  /* Phosphor glow — dark halo on light bg */
+  --crt-phosphor: 20, 20, 20;
+  --crt-glow-near: 0.45;
+  --crt-glow-mid: 0.20;
+  --crt-glow-crisp: 0.70;
+  --crt-heading-glow-near: 0.55;
+  --crt-heading-glow-mid: 0.30;
+  --crt-heading-glow-far: 0.12;
+
+  --crt-scanline-dark: 0.15;
+  /* lighter scanlines on bright bg */
+  --crt-scanline-pitch: 3px;
+
+  --crt-vignette-start: 52%;
+  --crt-vignette-mid: 0.28;
+  --crt-vignette-edge: 0.58;
+
+  --crt-glass-bright: 0.08;
+  --crt-glass-dark: 0.04;
+
+  --crt-perspective: 900px;
+  --crt-warp-x: 0.05deg;
+
+  --crt-kinescope-opacity: 0.04;
+
+  /* --- Color grade presets (use one of these names in --crt-grade-filter) --- */
+  --crt-grade-none: ;
+  --crt-grade-monochrome: grayscale(1);
+  --crt-grade-luminance: url(#crt-filter-luminance);
+  /* 0.3R + 0.59G + 0.11B */
+  --crt-grade-sepia: sepia(0.85) brightness(0.95);
+  --crt-grade-heatmap: grayscale(1) sepia(1) hue-rotate(-50deg) saturate(8) contrast(1.4);
+  --crt-grade-heatmapSvg: url(#crt-filter-heatmap-svg);
+  --crt-grade-cool: hue-rotate(180deg) saturate(1.8) brightness(0.9);
+  --crt-grade-invert: invert(1);
+  --crt-grade-nightVision: invert(1) hue-rotate(90deg) saturate(3) brightness(0.85);
+  --crt-grade-bleach: contrast(1.4) brightness(1.1) saturate(0.4);
+
+  /* --- Active color grade — set to one of the preset vars above --- */
+  --crt-grade-filter: var(--crt-grade-luminance);
+
+  --crt-startup-dur: 5.2s;
+  --crt-flicker-dur: 0.18s;
+  --crt-interlace-dur: 0.5s;
+}
+
+/* --- Dark mode overrides ------------------------------------- */
+.dark {
+  --crt-bg: #1a1a1a;
+  /* dark screen */
+  --crt-bg-soft: #242424;
+  --crt-bg-mute: #2e2e2e;
+  --crt-bg-code: #111111;
+  --crt-nav-bg: 26, 26, 26;
+
+  --crt-text: #d0d0d0;
+  /* phosphor-white text */
+  --crt-text-dim: #909090;
+  --crt-text-faint: #606060;
+  --crt-border: #333333;
+
+  /* Phosphor glow — bright halo on dark bg */
+  --crt-phosphor: 210, 210, 210;
+  --crt-glow-near: 0.70;
+  --crt-glow-mid: 0.40;
+  --crt-glow-crisp: 0.90;
+  --crt-heading-glow-near: 0.85;
+  --crt-heading-glow-mid: 0.55;
+  --crt-heading-glow-far: 0.30;
+
+  --crt-scanline-dark: 0.28;
+
+  --crt-vignette-mid: 0.38;
+  --crt-vignette-edge: 0.72;
+
+  --crt-glass-bright: 0.03;
+  --crt-glass-dark: 0.08;
+}
+
+/* ================================================================
+   VitePress theme tokens — wired to our CRT variables
+   ================================================================ */
+:root {
+  --vp-c-brand: #b8b8b8;
+  --vp-c-brand-light: var(--crt-text);
+  --vp-c-brand-dark: var(--crt-text-dim);
+  --vp-c-bg: var(--crt-bg);
+  --vp-c-bg-soft: var(--crt-bg-soft);
+  --vp-c-bg-mute: var(--crt-bg-mute);
+  --vp-c-text-1: var(--crt-text);
+  --vp-c-text-2: var(--crt-text-dim);
+  --vp-c-text-3: var(--crt-text-faint);
+  --vp-c-divider: var(--crt-border);
+  --vp-font-family-base: 'JetBrains Mono', 'Courier New', Courier, monospace;
+  --vp-font-family-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
+}
+
+/* ================================================================
+   BASE ELEMENTS
+   ================================================================ */
+
+html {
+  background: var(--crt-tv-off);
+  /* visible before body paints */
+}
+
+
+/* Dark CRT screen with phosphor white glow */
+body {
+  background-color: var(--crt-bg);
+  color: var(--crt-text);
+  text-shadow:
+    0 0 8px rgba(var(--crt-phosphor), var(--crt-glow-near)),
+    0 0 18px rgba(var(--crt-phosphor), var(--crt-glow-mid)),
+    0 0 2px rgba(255, 255, 255, var(--crt-glow-crisp));
+}
+
+/* ----------------------------------------------------------------
+   SCANLINE OVERLAY  (body::before)
+   ---------------------------------------------------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, var(--crt-scanline-dark)) 0px,
+      rgba(0, 0, 0, var(--crt-scanline-dark)) 1px,
+      transparent 1px,
+      transparent var(--crt-scanline-pitch));
+  background-size: 100% var(--crt-scanline-pitch);
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  /* revealed by startup animation */
+}
+
+/* ----------------------------------------------------------------
+   VIGNETTE  (body::after)
+   ---------------------------------------------------------------- */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(ellipse 150% 100% at center,
+      transparent 0%,
+      transparent var(--crt-vignette-start),
+      rgba(0, 0, 0, var(--crt-vignette-mid)) 82%,
+      rgba(0, 0, 0, var(--crt-vignette-edge)) 100%);
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0;
+  /* revealed by startup animation */
+}
+
+/* ----------------------------------------------------------------
+   POWER-ON OVERLAY  (html::before) — startup sequence runs here
+   ---------------------------------------------------------------- */
+html::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--crt-tv-off);
+  pointer-events: none;
+  z-index: 10001;
+}
+
+/* ----------------------------------------------------------------
+   GLASS REFLECTION  (html::after)
+   ---------------------------------------------------------------- */
+html::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, var(--crt-glass-bright)) 0%,
+      transparent 35%,
+      transparent 65%,
+      rgba(0, 0, 0, var(--crt-glass-dark)) 100%);
+  pointer-events: none;
+  z-index: 10002;
+  opacity: 0;
+}
+
+/* ================================================================
+   ANIMATIONS — unconditional, always play on page load
+   ================================================================ */
+
+/* ----------------------------------------------------------------
+   TV POWER-ON SEQUENCE  (html::before overlay)
+
+   Timeline (total: --crt-startup-dur, default 5.2s):
+     0%  – 12%   Flat grey — TV completely off
+     12% – 15%   White flash — electrical spark
+     15% – 40%   Moving static — noise shifts each keyframe (~10fps)
+     40% – 58%   Vertical expansion — squeezes to centre line, expands
+     58% – 69%   Brightness sweep — bright band rolls top → bottom
+     69% – 100%  Fade out — content takes over
+   ---------------------------------------------------------------- */
+@keyframes tv-powerup {
+  0% {
+    background: #888;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  12% {
+    background: #888;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  13% {
+    background: #eee;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  15% {
+    background: #2a2a2a;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  /* Static — noise SVG with position shifted each step */
+  16% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') 0% 0%/200px 200px, #444;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  18% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') -18% 13%/200px 200px, #444;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  20% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') 22% -9%/200px 200px, #444;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  22% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') -5% 20%/200px 200px, #3a3a3a;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  24% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') 15% -17%/200px 200px, #3a3a3a;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  26% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') -24% 7%/200px 200px, #333;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  28% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') 10% 18%/200px 200px, #333;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  30% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') -19% -11%/200px 200px, #2a2a2a;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  32% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') 25% 5%/200px 200px, #2a2a2a;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  34% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') -8% -22%/200px 200px, #222;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  36% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') 12% 15%/200px 200px, #222;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  38% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') -21% -4%/200px 200px, #1a1a1a;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  40% {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="200" height="200" filter="url(%23n)"/></svg>') 6% 23%/200px 200px, #1a1a1a;
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  /* Vertical expansion */
+  42% {
+    background: rgba(155, 155, 155, 0.65);
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  50% {
+    background: rgba(220, 220, 220, 0.80);
+    clip-path: inset(49% 0 49% 0);
+    opacity: 1;
+  }
+
+  58% {
+    background: rgba(175, 175, 175, 0.50);
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  /* Brightness sweep — band rolls top to bottom */
+  62% {
+    background: linear-gradient(to bottom,
+        transparent 0%, transparent 2%,
+        rgba(255, 255, 255, 0.80) 4%, rgba(255, 255, 255, 0.80) 8%,
+        transparent 10%, transparent 100%);
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  69% {
+    background: linear-gradient(to bottom,
+        transparent 0%, transparent 90%,
+        rgba(255, 255, 255, 0.80) 92%, rgba(255, 255, 255, 0.80) 96%,
+        transparent 98%, transparent 100%);
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+
+  /* Fade out */
+  75% {
+    background: rgba(200, 200, 200, 0.12);
+    clip-path: inset(0 0 0 0);
+    opacity: 0.45;
+  }
+
+  90% {
+    background: transparent;
+    opacity: 0.08;
+  }
+
+  100% {
+    background: transparent;
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+}
+
+/* Content brightens as overlay lifts */
+@keyframes content-powerup {
+  0% {
+    filter: brightness(0);
+  }
+
+  30% {
+    filter: brightness(0);
+  }
+
+  50% {
+    filter: brightness(0.06);
+  }
+
+  58% {
+    filter: brightness(0.40);
+  }
+
+  65% {
+    filter: brightness(1.40);
+  }
+
+  75% {
+    filter: brightness(0.85);
+  }
+
+  85% {
+    filter: brightness(1.08);
+  }
+
+  100% {
+    filter: none;
+  }
+}
+
+@keyframes scanlines-appear {
+  0% {
+    opacity: 0;
+  }
+
+  70% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes vignette-appear {
+  0% {
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes glass-appear {
+  0% {
+    opacity: 0;
+  }
+
+  82% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes crt-flicker {
+  0% {
+    opacity: 1;
+  }
+
+  7% {
+    opacity: 0.985;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  52% {
+    opacity: 0.992;
+  }
+
+  80% {
+    opacity: 0.988;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes interlace-drift {
+  0% {
+    background-position: 0 0;
+  }
+
+  50% {
+    background-position: 0 1px;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}
+
+/* Apply */
+body {
+  /* content-powerup removed — html::before overlay covers content during startup,
+     filter on body was breaking position:fixed for the nav and other overlays */
+  animation: crt-flicker var(--crt-flicker-dur) infinite calc(var(--crt-startup-dur) + 0.3s);
+}
+
+body::before {
+  animation:
+    scanlines-appear var(--crt-startup-dur) ease-out 1 forwards,
+    interlace-drift var(--crt-interlace-dur) infinite calc(var(--crt-startup-dur) + 0.3s);
+}
+
+body::after {
+  animation: vignette-appear var(--crt-startup-dur) ease-out 1 forwards;
+}
+
+html::before {
+  animation: tv-powerup var(--crt-startup-dur) ease-out 1 forwards;
+}
+
+html::after {
+  animation: glass-appear var(--crt-startup-dur) ease-out 1 forwards;
+}
+
+/* ----------------------------------------------------------------
+   REDUCED MOTION — skip startup, show content immediately
+   ---------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+    filter: none;
+  }
+
+  body::before {
+    animation: none;
+    opacity: 1;
+  }
+
+  body::after {
+    animation: none;
+    opacity: 1;
+  }
+
+  html::before {
+    animation: none;
+    opacity: 0;
+    background: transparent;
+  }
+
+  html::after {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ================================================================
+   TYPOGRAPHY
+   ================================================================ */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-shadow:
+    0 0 10px rgba(var(--crt-phosphor), var(--crt-heading-glow-near)),
+    0 0 22px rgba(var(--crt-phosphor), var(--crt-heading-glow-mid)),
+    0 0 35px rgba(var(--crt-phosphor), var(--crt-heading-glow-far)),
+    0 0 2px rgba(255, 255, 255, 1);
+  letter-spacing: 0.5px;
+}
+
+a {
+  color: #cccccc;
+  text-shadow:
+    0 0 5px rgba(var(--crt-phosphor), 0.55),
+    0 0 12px rgba(var(--crt-phosphor), 0.25);
+}
+
+a:hover {
+  color: #f0f0f0;
+  text-shadow:
+    0 0 8px rgba(var(--crt-phosphor), 0.90),
+    0 0 18px rgba(var(--crt-phosphor), 0.60),
+    0 0 30px rgba(var(--crt-phosphor), 0.40);
+}
+
+/* ================================================================
+   VITEPRESS HERO
+   ================================================================ */
+
+/* Banner background — drop a real image at docs/public/banner.jpg
+   and it'll be served from site root as /banner.jpg. Using logo.jpg
+   as a placeholder for now so you can see it working immediately;
+   swap the url() below once you have real banner art.
+   The dark linear-gradient sits on top as a scrim so hero text stays
+   readable over a busy image — first background-image layer wins on top. */
+.VPHero {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url('/logo.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.VPHero .name {
+  text-shadow:
+    0 0 12px rgba(255, 255, 255, 0.90),
+    0 0 25px rgba(255, 255, 255, 0.60),
+    0 0 45px rgba(255, 255, 255, 0.35),
+    0 0 2px rgba(255, 255, 255, 1);
+}
+
+.VPHero .tagline {
+  color: var(--crt-text-dim);
+  text-shadow:
+    0 0 6px rgba(var(--crt-phosphor), 0.60),
+    0 0 14px rgba(var(--crt-phosphor), 0.30);
+}
+
+.VPButton.medium.brand {
+  background: transparent;
+  border: 1px solid var(--crt-text-dim);
+  color: var(--crt-text);
+  text-shadow: 0 0 5px rgba(var(--crt-phosphor), 0.50);
+  box-shadow:
+    0 0 8px rgba(var(--crt-phosphor), 0.20),
+    inset 0 0 12px rgba(var(--crt-phosphor), 0.05);
+}
+
+.VPButton.medium.brand:hover {
+  border-color: var(--crt-text);
+  box-shadow:
+    0 0 14px rgba(var(--crt-phosphor), 0.40),
+    inset 0 0 18px rgba(var(--crt-phosphor), 0.08);
+}
+
+.VPButton.medium.alt {
+  background: transparent;
+  border: 1px solid var(--crt-text-faint);
+  color: var(--crt-text-dim);
+}
+
+.VPButton.medium.alt:hover {
+  border-color: var(--crt-text-dim);
+  color: var(--crt-text);
+}
+
+/* ================================================================
+   VITEPRESS NAV
+   ================================================================ */
+
+.VPNav {
+  background: rgba(var(--crt-nav-bg), 0.92) !important;
+  border-bottom: 1px solid var(--crt-border);
+  backdrop-filter: blur(4px);
+}
+
+.VPNavBar .title {
+  color: var(--crt-text);
+  text-shadow:
+    0 0 8px rgba(var(--crt-phosphor), 0.70),
+    0 0 16px rgba(var(--crt-phosphor), 0.35);
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.VPNavBarMenuLink {
+  color: var(--crt-text-dim) !important;
+}
+
+.VPNavBarMenuLink:hover,
+.VPNavBarMenuLink.active {
+  color: var(--crt-text) !important;
+  text-shadow: 0 0 8px rgba(var(--crt-phosphor), 0.60);
+}
+
+/* ================================================================
+   SIDEBAR
+   ================================================================ */
+
+.VPSidebar {
+  background: var(--crt-bg) !important;
+  border-right: 1px solid var(--crt-border);
+}
+
+.VPSidebarItem .text {
+  color: var(--crt-text-dim);
+}
+
+.VPSidebarItem.is-active .text,
+.VPSidebarItem .text:hover {
+  color: var(--crt-text);
+  text-shadow: 0 0 6px rgba(var(--crt-phosphor), 0.50);
+}
+
+/* ================================================================
+   CONTENT AREA
+   ================================================================ */
+
+.vp-doc {
+  transform: perspective(var(--crt-perspective)) rotateX(var(--crt-warp-x));
+}
+
+/* ================================================================
+   CODE BLOCKS
+   ================================================================ */
+
+.vp-code-group,
+div[class*="language-"] {
+  border: 1px solid var(--crt-border);
+  background: var(--crt-bg-code) !important;
+}
+
+code {
+  color: #b8b8b8;
+  background: var(--crt-bg-soft);
+  text-shadow:
+    0 0 4px rgba(var(--crt-phosphor), 0.50),
+    0 0 8px rgba(var(--crt-phosphor), 0.20);
+}
+
+/* ================================================================
+   CUSTOM TELEMETRY CARD COMPONENT
+   ================================================================ */
+
+.telemetry-card {
+  border: 1px solid #444;
+  background: rgba(var(--crt-phosphor), 0.02);
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 10px rgba(var(--crt-phosphor), 0.18),
+    inset 0 0 20px rgba(var(--crt-phosphor), 0.04);
+}
+
+.telemetry-card::before {
+  content: "ACTIVE_FEED";
+  position: absolute;
+  top: 2px;
+  right: 5px;
+  font-size: 0.5rem;
+  color: rgba(var(--crt-phosphor), 0.45);
+}
+
+/* ================================================================
+   MARKDOWN CUSTOM BLOCKS
+   ================================================================ */
+
+.custom-block.tip {
+  border-color: var(--crt-text-faint);
+  background: var(--crt-bg-code);
+  border-width: 1px;
+  text-transform: uppercase;
+  box-shadow:
+    0 0 8px rgba(var(--crt-phosphor), 0.12),
+    inset 0 0 10px rgba(var(--crt-phosphor), 0.03);
+}
+
+/* ================================================================
+   SCROLLBAR
+   ================================================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--crt-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--crt-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--crt-text-faint);
+}
