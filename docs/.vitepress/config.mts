@@ -45,6 +45,12 @@ function sectionSidebarItems(folder: string) {
 export default defineConfig({
   title: "CAPTAIN VIDEO",
   description: "Citizen Scientist Mobile Command Center",
+  // TEMPORARY — required while this repo has no custom domain attached
+  // and serves as a GitHub Pages *project* page at /ScottKirvan.com/.
+  // Once the custom domain (www.scottkirvan.com) is cut over to this
+  // repo, this line must be removed (or set to '/'), or every asset
+  // path will be wrong under the domain root.
+  base: '/ScottKirvan.com/',
   appearance: 'dark', // Default dark, but light mode is a bright-room TV look
   themeConfig: {
     // logo: '/sc-logo-retro.png', // TODO: add logo when ready
