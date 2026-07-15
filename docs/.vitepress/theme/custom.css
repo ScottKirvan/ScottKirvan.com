@@ -4,6 +4,24 @@
    ================================================================ */
 
 /* ================================================================
+   CAPTAIN VIDEO WORDMARK FONT
+   Hand-built from a frame of the original TV show. LIMITED GLYPH SET —
+   only covers the letters in "CAPTAIN VIDEO AND HIS VIDEO RANGERS"
+   (A C D E G H I N O P R S T V + space). Do NOT apply broadly to
+   headings/body text — any character outside that set silently falls
+   back to the next font in the stack, which reads as visually broken
+   mid-word. Scope this to short phrases you've verified are fully
+   covered (the nav title "CAPTAIN VIDEO" is the current safe case).
+   ================================================================ */
+@font-face {
+  font-family: 'Captain Video';
+  src: url('/fonts/CaptainVideo-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ================================================================
    TWEAK HERE — all tuneable values in one place
 
    Light mode  = TV in a bright room (light grey bg, dark text)
@@ -681,7 +699,9 @@ a:hover {
   text-shadow:
     0 0 8px rgba(var(--crt-phosphor), 0.70),
     0 0 16px rgba(var(--crt-phosphor), 0.35);
-  font-family: 'JetBrains Mono', monospace;
+  /* Safe here: nav title text is exactly "CAPTAIN VIDEO" — fully
+     covered by the limited wordmark glyph set. See @font-face above. */
+  font-family: 'Captain Video', 'JetBrains Mono', monospace;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
