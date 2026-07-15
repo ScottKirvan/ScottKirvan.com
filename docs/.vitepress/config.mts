@@ -55,14 +55,14 @@ export default defineConfig({
   themeConfig: {
     // logo: '/sc-logo-retro.png', // TODO: add logo when ready
     nav: [
-      { text: '[ Labs ]', link: '/root/foundry/' },
+      { text: '[ DevLab ]', link: '/root/devlab/' },
       { text: '[ Gomtuu ]', link: '/root/gomtuu_specs/' },
       { text: "[ Captain's Log ]", link: '/root/post_mortem/' },
       { text: '[ Contact ]', link: 'https://patreon.com/yourlink' }
     ],
     sidebar: {
-      '/root/foundry/': [
-        { text: 'Active Projects', items: sectionSidebarItems('foundry') }
+      '/root/devlab/': [
+        { text: 'Active Projects', items: sectionSidebarItems('devlab') }
       ],
       '/root/gomtuu_specs/': [
         { text: 'Core Systems', items: sectionSidebarItems('gomtuu_specs') }
@@ -73,9 +73,11 @@ export default defineConfig({
       ]
     },
     socialLinks: [
-      { icon: 'patreon', link: 'https://github.com/ScottKirvan' },
-      { icon: 'discord', link: 'https://github.com/ScottKirvan' },
+      { icon: 'patreon', link: 'https://www.patreon.com/ScottKirvan' },
+      { icon: 'discord', link: 'https://discord.gg/TN6XJSNK5Y' },
       { icon: 'github', link: 'https://github.com/ScottKirvan' }
     ]
   }
 })
+
+

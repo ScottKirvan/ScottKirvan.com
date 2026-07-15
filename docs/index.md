@@ -25,17 +25,17 @@ hero:
 #    alt: Scott Kirvan
   actions:
     - theme: brand
-      text: Access Foundry
-      link: /root/foundry/
+      text: Access DevLab
+      link: /root/devlab/
     - theme: alt
       text: Hardware Specs
       link: /root/gomtuu_specs/
 
 features:
   - icon: 🔧
-    title: The Foundry
+    title: The DevLab
     details: Tools built and stress-tested under field conditions.
-    link: /root/foundry/
+    link: /root/devlab/
     linkText: Enter
   - icon: 🚐
     title: Gomtuu Specs

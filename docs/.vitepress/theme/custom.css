@@ -635,8 +635,8 @@ a:hover {
    readable over a busy image — first background-image layer wins on top. */
 .VPHero {
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url('/logo.jpg');
+    linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)),
+    url('/banner.png');
   background-size: cover;
   background-position: center;
 }
@@ -703,7 +703,7 @@ a:hover {
      covered by the limited wordmark glyph set. See @font-face above. */
   font-family: 'Captain Video', 'JetBrains Mono', monospace;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: -1.5px;
 }
 
 .VPNavBarMenuLink {

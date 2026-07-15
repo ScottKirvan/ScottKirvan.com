@@ -1,11 +1,11 @@
-# [ FOUNDRY ]
+# [ DEVLAB ]
 
 **Force Multipliers & Workflow Acceleration**
 
 Repository of specialized tools, libraries, and frameworks that amplify creative and technical capacity.
 
 ## Overview
-The Foundry is where Captain Video tests and validates tools. If it survives field conditions, it earns its place in the arsenal.
+The DevLab is where Captain Video tests and validates tools. If it survives field conditions, it earns its place in the arsenal.
 
 ---
 
