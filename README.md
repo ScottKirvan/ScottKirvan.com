@@ -1,4 +1,4 @@
-# ScottKirvan.com [![starline](https://starlines.qoo.monster/assets/ScottKirvan/ScottKirvan.com)](https://github.com/qoomon/starline)
+﻿# ScottKirvan.com [![starline](https://raw.githubusercontent.com/ScottKirvan/ScottKirvan.com/refs/heads/starlines/ScottKirvan/ScottKirvan.com/starline.svg)](https://github.com/qoomon/starlines)
 <div align="center">
 
   <img src="assets/media/logo.jpg" alt="logo" width="200" height="auto" />
