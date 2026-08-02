@@ -26,7 +26,7 @@
   <a href="https://github.com/ScottKirvan/ScottKirvan.com/blob/main/LICENSE.md">
     <img src="https://img.shields.io/github/license/ScottKirvan/ScottKirvan.com.svg" alt="license" />
   </a>
-  <a href="https://discord.gg/gQH4mXWQRT">
+  <a href="https://discord.gg/TN6XJSNK5Y">
     <!--<img src="https://img.shields.io/discord/704680098577514527?style=flat-square&label=%F0%9F%92%AC%20discord&color=00ACD7">-->
     <img src="https://img.shields.io/discord/1052011377415438346?style=flat-square&label=discord&color=00ACD7">
   </a>
@@ -131,7 +131,7 @@ Contributions / Contact
 -----------------------
 - Please [file an issue](https://github.com/ScottKirvan/ScottKirvan.com/issues/new), or [grab a fork](https://github.com/ScottKirvan/ScottKirvan.com/fork), hack away, and submit a [pull request](https://github.com/ScottKirvan/ScottKirvan.com/pulls).
 - Contact me at [linkedin.com/in/scottkirvan/](https://www.linkedin.com/in/scottkirvan/)
-- You can also contact me at my [discord](https://discord.gg/TSKHvVFYxB) server, I'm cptvideo.
+- You can also contact me at my [discord](https://discord.gg/TN6XJSNK5Y) server, I'm cptvideo.
 
 Credits
 -------
